@@ -53,13 +53,13 @@ function Create-User {
 
 	New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
  
-}
+         }
      catch {
      
      	Write-Host "`nFailed to create user: $($_.Exception.Message)`n"
       
+	   }
 }
-
 if ($RemoteSetup) {
     Create-User
 }
