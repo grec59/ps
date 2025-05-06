@@ -12,7 +12,7 @@ $pspath = (Get-Process -Id $PID).Path
 
 $date = (Get-Date).DateTime
 
-$scriptpath = 'https://raw.githubusercontent.com/grec59/ps/refs/heads/main/Prepare-Image.ps1'
+$scriptpath = 'https://raw.githubusercontent.com/grec59/ps/refs/heads/development/Prepare-Image.ps1'
 
 # Check for administrative session, establishes new elevated session if needed
 
