@@ -1,12 +1,18 @@
+param (
+    [switch]$RemoteSetup
+)
+
 Clear-Host
 
 # Establish variables
+
+$log = 'C:\results.txt'
 
 $pspath = (Get-Process -Id $PID).Path
 
 $date = (Get-Date).DateTime
 
-$scriptpath = '\\dbfsvs02\ITdb\Tech\Staff` Techs\Austin` Greco\Scripts\Prepare-Image.ps1'
+$scriptpath = 'https://raw.githubusercontent.com/grec59/ps/refs/heads/main/Prepare-Image.ps1'
 
 # Check for administrative session, establishes new elevated session if needed
 
@@ -17,12 +23,12 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 $message = @{
     Text = "Welcome to the Post-Image Utilities Script. This script will perform the following on: `n$date"
     Tasks = @(
-		"`n"
+	"`n"
         '1. Update Group Policy'
         '2. Configuration Manager Actions'
         '3. Dell System Updates'
-        '4. Creates Remote User'
-		"`n"
+        '4. Creates Remote User (Optional)'
+	"`n"
     )
 }
 
@@ -31,11 +37,27 @@ $message.Tasks | ForEach-Object { Write-Host $_ }
 
 # Retrieve User Confirmation
 
-Read-Host -Prompt 'Press any key to continue with tasks or CTRL+C to quit' | Out-Null
+Read-Host -Prompt 'Press any key to continue or CTRL+C to quit' | Out-Null
 
 # Start PowerShell Transcript
 
 Start-Transcript -Path C:\results.txt
+
+# Create Local User Account
+
+function Create-User {
+
+$Password = Read-Host 'A local account will be created for initial logon. Enter a password' -AsSecureString
+
+New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
+
+Write-Host 'The local user account has been created.'
+
+}
+
+if ($RemoteSetup) {
+    Create-User
+}
 
 # Group Policy Update
 
@@ -48,7 +70,7 @@ function Invoke-GroupPolicy {
 
 Invoke-GroupPolicy
 
-Write-Host 'Starting Configuration Manager Actions'
+Write-Host 'Running Configuration Manager Actions'
 
 Start-Sleep -Seconds 30
 
@@ -114,32 +136,4 @@ Dell-Updates
 
 Start-Sleep -Seconds 5
 
-# Create Local User Account
-
-function Create-User {
-
-$RemoteUserInquiry = Read-Host "`nIs this setup for a remote (off-campus) user? Y or N"
-
-if ($RemoteUserInquiry -eq 'Y') {
-
-$Password = Read-Host 'A local account will be created for initial logon. Enter a password' -AsSecureString
-
-New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
-
-Write-Host 'The Post-Installation Utilities Script is complete.'
-
-Stop-Transcript
-
-}
-
-else {
-
-Write-Host 'The Post-Installation Utilities Script is complete.'
-
-Stop-Transcript
-
-}
-
-}
-
-Create-User
+Write-Host "`nScript execution complete, check $log for results.`n"
