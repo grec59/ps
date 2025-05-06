@@ -112,7 +112,7 @@ $log = Join-Path $logDir 'results.txt'
 
 $pspath = (Get-Process -Id $PID).Path
 $date = (Get-Date).DateTime
-$scriptpath = ''
+$scriptpath = 'https://raw.githubusercontent.com/grec59/ps/refs/heads/main/Prepare-Image.ps1'
 
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Start-Process "$pspath" -Verb runAs -ArgumentList '-NoExit', '-ExecutionPolicy RemoteSigned', "-Command & '$scriptpath'"
