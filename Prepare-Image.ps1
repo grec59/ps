@@ -37,7 +37,7 @@ $message.Tasks | ForEach-Object { Write-Host $_ }
 
 # Retrieve User Confirmation
 
-Read-Host -Prompt 'Press any key to continue or CTRL+C to quit' | Out-Null
+Read-Host -Prompt "`nPress any key to continue or CTRL+C to quit`n" | Out-Null
 
 # Start PowerShell Transcript
 
@@ -47,11 +47,11 @@ Start-Transcript -Path C:\results.txt
 
 function Create-User {
 
-$Password = Read-Host 'A local account will be created for initial logon. Enter a password' -AsSecureString
+$Password = Read-Host "`nA standard account will be created for local logon. Enter a password" -AsSecureString
 
 New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
 
-Write-Host 'The local user account has been created.'
+Write-Host "The local eagle user account has been created.`n"
 
 }
 
