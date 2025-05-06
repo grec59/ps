@@ -27,7 +27,7 @@ $message = @{
         '1. Update Group Policy'
         '2. Configuration Manager Actions'
         '3. Dell System Updates'
-        '4. Creates Remote User (Optional)'
+        #'4. Creates Remote User'
 	"`n"
     )
 }
