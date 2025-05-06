@@ -47,12 +47,16 @@ Start-Transcript -Path C:\results.txt
 
 function Create-User {
 
-$Password = Read-Host "`nA standard account will be created for local logon. Enter a password" -AsSecureString
+     try {
 
-New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
+	$Password = Read-Host "`nA standard account will be created for local logon. Enter a password" -AsSecureString
 
-Write-Host "The local eagle user account has been created.`n"
+	New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
 
+	Write-Host "The local eagle user account has been created.`n"
+}
+     catch {
+     	Write-Host "`nFailed to create user: $($_.Exception.Message)`n"
 }
 
 if ($RemoteSetup) {
