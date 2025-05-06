@@ -37,7 +37,7 @@ $message.Tasks | ForEach-Object { Write-Host $_ }
 
 # Retrieve User Confirmation
 
-Read-Host -Prompt "`nPress any key to continue or CTRL+C to quit`n" | Out-Null
+Read-Host -Prompt "`nPress any key to continue or CTRL+C to quit" | Out-Null
 
 # Start PowerShell Transcript
 
