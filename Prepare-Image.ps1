@@ -40,9 +40,12 @@ $message.Tasks | ForEach-Object { Write-Host $_ }
 Read-Host -Prompt "Press any key to continue or CTRL+C to quit" | Out-Null
 
 # Start PowerShell Transcript
-
-Start-Transcript -Path C:\results.txt
-
+     try {
+	Start-Transcript -Path C:\results.txt
+     }
+     catch {
+    Write-Host "`nWARNING: Failed to start transcript: $($_.Exception.Message)`n" -ForegroundColor Yellow
+     }
 # Create Local User Account
 
 function Create-User {
