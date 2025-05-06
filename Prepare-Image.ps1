@@ -138,4 +138,6 @@ Dell-Updates
 
 Start-Sleep -Seconds 5
 
-Write-Host "`nScript execution complete, check $log for results.`n"
+Write-Host "`nScript execution complete.`n"
+
+Stop-Transcript
