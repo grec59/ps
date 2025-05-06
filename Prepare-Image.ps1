@@ -26,25 +26,21 @@ function Create-User {
         $Password = Read-Host 'A standard account will be created for local logon. Enter a password' -AsSecureString
         New-LocalUser -Name 'eagle' -Password $Password -Description 'Initial Access for Remote Users' -AccountNeverExpires
         Write-Host "`nThe eagle user has been created.`n" -ForegroundColor Green
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] User 'eagle' created successfully."
     }
     catch {
         Write-Host "`nFailed to create user: $($_.Exception.Message)`n" -ForegroundColor Red
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] ERROR creating user: $($_.Exception.Message)"
     }
 }
 
 function Invoke-GroupPolicy {
     Write-Host 'Updating Group Policy...'
     try {
-        gpupdate /force >> $log
+        gpupdate /force
         Start-Sleep -Seconds 25
         Write-Host 'Group Policy updated.' -ForegroundColor Green
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Group Policy updated."
     }
     catch {
         Write-Host 'Group Policy update failed.' -ForegroundColor Red
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] ERROR during Group Policy update: $($_.Exception.Message)"
     }
 }
 
@@ -67,18 +63,16 @@ function Execute-Actions {
 
     foreach ($action in $SCCMActions) {
         try {
-            $result = Invoke-WmiMethod -Namespace root\ccm -Class SMS_CLIENT -Name TriggerSchedule -ArgumentList $action
-            Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Action $action SUCCEEDED. Output: $($result | Out-String)"
+            Invoke-WmiMethod -Namespace root\ccm -Class SMS_CLIENT -Name TriggerSchedule -ArgumentList $action
         }
         catch {
-            Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Action $action FAILED. Error: $($_.Exception.Message)"
             $errors = $true
         }
         Start-Sleep -Seconds 2
     }
 
     if ($errors) {
-        Write-Host "Errors occurred during SCCM actions. Check log." -ForegroundColor Red
+        Write-Host "Errors occurred during SCCM actions. Check system logs." -ForegroundColor Red
     }
     else {
         Write-Host "Configuration actions completed successfully." -ForegroundColor Green
@@ -91,16 +85,13 @@ function Dell-Updates {
         Write-Host "`nDell Command found, starting Dell updates`n"
         try {
             & "$path" /applyUpdates -autoSuspendBitLocker=enable -outputLog 'C:\command.log'
-            Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Dell Command Update ran successfully."
         }
         catch {
             Write-Host "`nDell update failed: $($_.Exception.Message)`n" -ForegroundColor Red
-            Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] ERROR running Dell updates: $($_.Exception.Message)"
         }
     }
     else {
         Write-Host "`nDell Command not found, skipping updates.`n"
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Dell Command not found. Skipping updates."
     }
 }
 
@@ -143,11 +134,9 @@ try {
 }
 catch {
     Write-Host "`nWARNING: Failed to start transcript: $($_.Exception.Message)`n" -ForegroundColor Yellow
-    Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] Failed to start transcript: $($_.Exception.Message)"
 }
 
 if ($RemoteSetup) {
-    Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] RemoteSetup parameter detected. Proceeding to create user."
     Create-User
 }
 
@@ -170,7 +159,7 @@ catch {
     Write-Host "`nWARNING: Could not stop transcript properly: $($_.Exception.Message)`n" -ForegroundColor Yellow
 }
 
-Write-Host "`nAll tasks completed. Please review $log for full details.`n" -ForegroundColor Cyan
+Write-Host "`nAll tasks completed. Please review the transcript log for full details.`n" -ForegroundColor Cyan
 
 $reboot = Read-Host "Do you want to reboot now? (Y/N)"
 if ($reboot -match '^[Yy]$') {
@@ -180,7 +169,6 @@ if ($reboot -match '^[Yy]$') {
     }
     catch {
         Write-Host "Failed to reboot: $($_.Exception.Message)" -ForegroundColor Red
-        Add-Content -Path $log -Value "[$(Get-Date -Format 'yyyy-MM-ddTHH:mm:ss')] ERROR restarting computer: $($_.Exception.Message)"
     }
 }
 else {
